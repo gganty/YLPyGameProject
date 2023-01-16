@@ -4,8 +4,8 @@ import math
 import random
 import pygame
 import time
-import pickle
 import pytmx
+import socket
 
 # Изображение не получится загрузить
 # без предварительной инициализации pygame
@@ -14,8 +14,9 @@ size = width, height = 1000, 1000
 screen = pygame.display.set_mode(size)
 SHOOT_TIME = 1.0
 glag = 1
-#exec(open('classes.py').read())
+# exec(open('classes.py').read())
 SETTINGS = False
+
 
 def rast(tup1, tup2):
     return math.sqrt((tup1[0] - tup2[0]) ** 2 + (tup1[1] - tup2[1]) ** 2)
@@ -56,10 +57,10 @@ def moncol(col):
 
 
 def AI(tank):
-    #scr1 = pygame.surface.Surface(100, 100)
+    # scr1 = pygame.surface.Surface(100, 100)
     newang = math.degrees(math.atan2(0 - tank.y, 0 - tank.x)) % 360
     # self.angle += 0.5
-    #return 0, 0, False
+    # return 0, 0, False
     newang = 270 - newang
     # rot = 0
     # ang = tank.angle
@@ -137,7 +138,7 @@ def main_game():
             if not tank1.player:
                 mov1, ro1, is_shoot1 = AI(tank1)
                 tank1.move(yy, mov1)
-                #tank1.rotate(yy, rot1)
+                # tank1.rotate(yy, rot1)
                 if is_shoot1:
                     tank1.shoot()
             if tank1.player:
@@ -154,13 +155,29 @@ def main_game():
 
 
 def start_double():
+    mode = input("CHOOSE MODE (1 - HOST; 2 - CONNECT): ")
     global glag, SHOOT_TIME, tanks, group, maps, SETTINGS
     running = True
     tanks = []
     clock = pygame.time.Clock()
     group = pygame.sprite.Group()
-    tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=False))
-    tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=False))
+    if mode == 1:
+        tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=True, controlled=True))
+        tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=True, controlled=False))
+        host = socket.gethostname()
+        port = 5000
+        server_socket = socket.socket()
+        print("IP:", host + ":" + str(port))
+        server_socket.bind((host, port))
+        server_socket.listen(1)
+        conn, address = server_socket.accept()
+        print("Connection: " + str(address))
+    else:
+        host, port = map(str, input('Enter IP address and port ("IP:port"): ').split(":"))
+        client_socket = socket.socket()
+        client_socket.connect((host, int(port)))
+        tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=True, controlled=False))
+        tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=True, controlled=True))
     moves = []
     move = 0
     rot = 0
@@ -169,7 +186,8 @@ def start_double():
     is_shoot = False
     is_shoot1 = False
     while running:
-        for event in pygame.event.get():
+        a = pygame.event.get()
+        for event in a:
             if event.type == pygame.QUIT:
                 quit()
             # if event.type == pygame.MOUSEBUTTONDOWN:
@@ -179,68 +197,112 @@ def start_double():
             #     if event.button == pygame.BUTTON_LEFT:
             #         is_shoot = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
+                if event.key == pygame.K_w and mode == 1:
                     move = 1
-                if event.key == pygame.K_a:
+                if event.key == pygame.K_a and mode == 1:
                     rot = 1
-                if event.key == pygame.K_s:
+                if event.key == pygame.K_s and mode == 1:
                     move = -1
-                if event.key == pygame.K_d:
+                if event.key == pygame.K_d and mode == 1:
                     rot = -1
-                if event.key == pygame.K_F1:
-                    SHOOT_TIME -= 1
-                    SHOOT_TIME = abs(SHOOT_TIME)
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP and mode == 2:
                     move1 = 1
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT and mode == 2:
                     rot1 = 1
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN and mode == 2:
                     move1 = -1
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT and mode == 2:
                     rot1 = -1
-                if event.key == pygame.K_q:
+                if event.key == pygame.K_q and mode == 1:
                     is_shoot = True
-                if event.key == pygame.K_m:
+                if event.key == pygame.K_m and mode == 2:
                     is_shoot1 = True
-                if event.key == pygame.K_ESCAPE:
-                    glag = 1
-                    return
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_w:
+                if event.key == pygame.K_w and mode == 1:
                     move = 0
-                if event.key == pygame.K_a:
+                if event.key == pygame.K_a and mode == 1:
                     rot = 0
-                if event.key == pygame.K_s:
+                if event.key == pygame.K_s and mode == 1:
                     move = 0
-                if event.key == pygame.K_d:
+                if event.key == pygame.K_d and mode == 1:
                     rot = 0
-                if event.key == pygame.K_UP:
-                    move1 = 0
-                if event.key == pygame.K_LEFT:
-                    rot1 = 0
-                if event.key == pygame.K_DOWN:
-                    move1 = 0
-                if event.key == pygame.K_RIGHT:
-                    rot1 = 0
-                if event.key == pygame.K_q:
+                if event.key == pygame.K_q and mode == 1:
                     is_shoot = False
-                if event.key == pygame.K_m:
+                if event.key == pygame.K_UP and mode == 2:
+                    move1 = 0
+                if event.key == pygame.K_LEFT and mode == 2:
+                    rot1 = 0
+                if event.key == pygame.K_DOWN and mode == 2:
+                    move1 = 0
+                if event.key == pygame.K_RIGHT and mode == 2:
+                    rot1 = 0
+                if event.key == pygame.K_m and mode == 2:
                     is_shoot1 = False
-
+        a = str(a) + '|||' + str(pygame.mouse.get_pos())
+        conn.send(a.encode())
+        data = conn.recv(1024).decode()
+        data, coordinates = list(data.split('|||')[0]), tuple(data.split('|||')[1])
+        if mode == 1:
+            c1, c2 = pygame.mouse.get_pos(), coordinates
+        else:
+            c2, c1 = pygame.mouse.get_pos(), coordinates
+        for event in data:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w and mode == 2:
+                    move = 1
+                if event.key == pygame.K_a and mode == 2:
+                    rot = 1
+                if event.key == pygame.K_s and mode == 2:
+                    move = -1
+                if event.key == pygame.K_d and mode == 2:
+                    rot = -1
+                if event.key == pygame.K_q and mode == 2:
+                    is_shoot = True
+                if event.key == pygame.K_UP and mode == 1:
+                    move1 = 1
+                if event.key == pygame.K_LEFT and mode == 1:
+                    rot1 = 1
+                if event.key == pygame.K_DOWN and mode == 1:
+                    move1 = -1
+                if event.key == pygame.K_RIGHT and mode == 1:
+                    rot1 = -1
+                if event.key == pygame.K_m and mode == 1:
+                    is_shoot1 = True
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_w and mode == 2:
+                    move = 0
+                if event.key == pygame.K_a and mode == 2:
+                    rot = 0
+                if event.key == pygame.K_s and mode == 2:
+                    move = 0
+                if event.key == pygame.K_d and mode == 2:
+                    rot = 0
+                if event.key == pygame.K_q and mode == 2:
+                    is_shoot = False
+                if event.key == pygame.K_UP and mode == 1:
+                    move1 = 0
+                if event.key == pygame.K_LEFT and mode == 1:
+                    rot1 = 0
+                if event.key == pygame.K_DOWN and mode == 1:
+                    move1 = 0
+                if event.key == pygame.K_RIGHT and mode == 1:
+                    rot1 = 0
+                if event.key == pygame.K_m and mode == 1:
+                    is_shoot1 = False
         yy = clock.tick()
-        moves = [(move, rot, is_shoot), (move1, rot1, is_shoot1)]
+        moves = [(move, rot, is_shoot, c1), (move1, rot1, is_shoot1, c2)]
         screen.fill((0, 0, 0))
         maps.group.draw(screen)
         group.draw(screen)
         for tank1 in tanks:
-            move2, rot2, is_shoot2 = moves.pop(0)
+            move2, rot2, is_shoot2, m_coords = moves.pop(0)
             if is_shoot2 and tank1.player or not tank1.player:
                 tank1.shoot()
 
             if tank1.player:
                 tank1.move(yy, move2)
                 tank1.rotate(yy, rot2)
-            tank1.update(screen, yy, move2)
+            tank1.update(screen, yy, move2, coords=m_coords)
             if tank1.player:
                 pass
         if tanks[0].hp <= 0 and tanks[1].hp <= 0:
@@ -257,7 +319,6 @@ def start_double():
             return
         pygame.display.set_caption(f'{SETTINGS}')
         pygame.display.flip()
-
 
 
 def start_screen():
@@ -288,7 +349,6 @@ def start_screen():
         screen.blit(start, (0, 0))
         screen.blit(tank, s[ind])
         pygame.display.flip()
-
 
 
 def load_image(name, colorkey=None):
@@ -325,9 +385,9 @@ def blitRotate(surf, image, pos, originPos, angle):
     rotated_image_rect = rotated_image.get_rect(center=rotated_image_center)
 
     # rotate and blit the image
-    #surf.blit(rotated_image, rotated_image_rect)
-    #rotated_image.rect = rotated_image_rect
-    #pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()), 2)
+    # surf.blit(rotated_image, rotated_image_rect)
+    # rotated_image.rect = rotated_image_rect
+    # pygame.draw.rect(surf, (255, 0, 0), (*rotated_image_rect.topleft, *rotated_image.get_size()), 2)
     return rotated_image, rotated_image_center
 
 
@@ -355,15 +415,16 @@ class Map:
         for i in range(self.width):
             for j in range(self.height):
                 image = self.map.get_tile_image(i, j, 0)
-                self.group.add(Tile(self.group, image=image, id=self.map.get_tile_gid(i, j, 0), x=i, y=j, size=self.tile_size))
-
+                self.group.add(
+                    Tile(self.group, image=image, id=self.map.get_tile_gid(i, j, 0), x=i, y=j, size=self.tile_size))
 
 
 class Tank:
-    def __init__(self, group, pos, color, player=False, is_rotate=True):
+    def __init__(self, group, pos, color, player=False, is_rotate=True, controlled=True):
         self.main_group = group
         self.body = Body(self.main_group, tank=self, pos=[pos[0] - 1, pos[1] - 11], col=color)
-        self.tower = Tower(self.main_group, tank=self, pos=pos, col=color, player=player, is_rotate=is_rotate)
+        self.tower = Tower(self.main_group, tank=self, pos=pos, col=color, player=player, is_rotate=is_rotate,
+                           controlled=controlled)
         self.main_group.add(self.body)
         self.main_group.add(self.tower)
         self.shells = pygame.sprite.Group()
@@ -374,7 +435,7 @@ class Tank:
         self.color = color
         self.y = pos[1]
 
-    def update(self, screen, time, move):
+    def update(self, screen, time, move, coords=None):
         if self.hp <= 0:
             return
         self.tower.rect.x = self.x - math.cos(math.radians(270 - self.angle)) * 12
@@ -383,18 +444,18 @@ class Tank:
         self.body.rect.x = self.x
         self.body.rect.y = self.y
         self.body.update(screen, time, move)
-        self.tower.update(screen, time)
+        self.tower.update(screen, time, coords=coords)
         self.last = 0
 
         self.shells.update(screen, time)
         self.shells.draw(screen)
-        #HealthBar((self.x, self.y), self.hp)
+        # HealthBar((self.x, self.y), self.hp)
 
     def shoot(self):
         self.tower.shoot(self.shells)
 
     def move(self, time, pos):  # pos: 1
-            #tanks.remove(self)
+        # tanks.remove(self)
         x = 100 * time / 1000 * math.cos(math.radians(270 - self.angle)) * pos
         y = 100 * time / 1000 * math.sin(math.radians(270 - self.angle)) * pos
         s = pygame.sprite.spritecollide(self.body, self.main_group, False)
@@ -453,10 +514,12 @@ class Tank:
                     ify = False
                 s1.append(dx)
 
-        if (self.body.rect.x + x < 0 and self.body.rect.x > self.body.rect.x + x) or (self.body.rect.bottomright[0] + x > 1000 and self.body.rect.x < self.body.rect.x + x):
+        if (self.body.rect.x + x < 0 and self.body.rect.x > self.body.rect.x + x) or (
+                self.body.rect.bottomright[0] + x > 1000 and self.body.rect.x < self.body.rect.x + x):
             ifx = False
 
-        if (self.body.rect.y + y < 0 and self.body.rect.y > self.body.rect.y + y) or (self.body.rect.bottomright[1] + y > 1000 and self.body.rect.y < self.body.rect.y + y):
+        if (self.body.rect.y + y < 0 and self.body.rect.y > self.body.rect.y + y) or (
+                self.body.rect.bottomright[1] + y > 1000 and self.body.rect.y < self.body.rect.y + y):
             ify = False
         if ifx:
             self.x += x
@@ -466,12 +529,13 @@ class Tank:
     def rotate(self, time, angle):
         angle = angle * time * 90 / 1000
         newang = self.angle + angle
-        pipa = blitRotate(screen, self.body.original_image, (self.body.rect.x, self.body.rect.y), (self.body.w / 2, self.body.h / 2), self.angle)
+        pipa = blitRotate(screen, self.body.original_image, (self.body.rect.x, self.body.rect.y),
+                          (self.body.w / 2, self.body.h / 2), self.angle)
         newimage = pipa[0]
         newrect = newimage.get_rect(center=(self.x, self.y))
         newmask = pygame.mask.from_surface(newimage)
         oldrect = self.body.rect
-        #self.angle = newang
+        # self.angle = newang
         # self.body.update(screen, 0, 0)
         s = pygame.sprite.spritecollide(self.body, self.main_group, False)
 
@@ -482,7 +546,7 @@ class Tank:
                 offsetnew = ((-(newrect.x - i.rect.x), -(newrect.y - i.rect.y)))
                 offset = (-(self.body.rect.x - i.rect.x), -(self.body.rect.y - i.rect.y))
                 dx = newmask.overlap_area(i.mask, offset=offsetnew)
-                #pygame.display.set_caption(f'{dx}, {self.body.mask.overlap_area(i.mask, offset=offset)}')
+                # pygame.display.set_caption(f'{dx}, {self.body.mask.overlap_area(i.mask, offset=offset)}')
                 if self.body.mask.overlap_area(i.mask, offset=offset) != 0:
                     # pygame.display.set_caption(f'{self.body.mask.overlap_area(i.mask, offset=offset)}, {oldmask.overlap_area(oldmask, offset=offsetold)}')
                     glag = False
@@ -519,30 +583,30 @@ class Body(pygame.sprite.Sprite):
         if col == 'blue':
             self.image = load_image("body0.png", colorkey=(255, 255, 255))
             self.images = [load_image("body0.png", colorkey=(255, 255, 255)),
-                      load_image("body1.png", colorkey=(255, 255, 255)),
-                      load_image("body2.png", colorkey=(255, 255, 255)),
-                      load_image("body3.png", colorkey=(255, 255, 255))]
+                           load_image("body1.png", colorkey=(255, 255, 255)),
+                           load_image("body2.png", colorkey=(255, 255, 255)),
+                           load_image("body3.png", colorkey=(255, 255, 255))]
             self.w, self.h = self.image.get_size()
         elif col == 'green':
             self.image = load_image("body10.png", colorkey=(255, 255, 255))
             self.images = [load_image("body10.png", colorkey=(255, 255, 255)),
-                      load_image("body11.png", colorkey=(255, 255, 255)),
-                      load_image("body12.png", colorkey=(255, 255, 255)),
-                      load_image("body13.png", colorkey=(255, 255, 255))]
+                           load_image("body11.png", colorkey=(255, 255, 255)),
+                           load_image("body12.png", colorkey=(255, 255, 255)),
+                           load_image("body13.png", colorkey=(255, 255, 255))]
             self.w, self.h = self.image.get_size()
         elif col == 'red':
             self.image = load_image("body20.png", colorkey=(255, 255, 255))
             self.images = [load_image("body20.png", colorkey=(255, 255, 255)),
-                      load_image("body21.png", colorkey=(255, 255, 255)),
-                      load_image("body22.png", colorkey=(255, 255, 255)),
-                      load_image("body23.png", colorkey=(255, 255, 255))]
+                           load_image("body21.png", colorkey=(255, 255, 255)),
+                           load_image("body22.png", colorkey=(255, 255, 255)),
+                           load_image("body23.png", colorkey=(255, 255, 255))]
             self.w, self.h = self.image.get_size()
         elif col == 'yellow':
             self.image = load_image("body30.png", colorkey=(255, 255, 255))
             self.images = [load_image("body30.png", colorkey=(255, 255, 255)),
-                      load_image("body31.png", colorkey=(255, 255, 255)),
-                      load_image("body32.png", colorkey=(255, 255, 255)),
-                      load_image("body33.png", colorkey=(255, 255, 255))]
+                           load_image("body31.png", colorkey=(255, 255, 255)),
+                           load_image("body32.png", colorkey=(255, 255, 255)),
+                           load_image("body33.png", colorkey=(255, 255, 255))]
             self.w, self.h = self.image.get_size()
         self.rect = self.image.get_rect()
         self.rect.x = pos[0]
@@ -576,9 +640,8 @@ class Body(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
 
-
 class Tower(pygame.sprite.Sprite):
-    def __init__(self, *group, tank, pos, col, player, is_rotate=True):
+    def __init__(self, *group, tank, pos, col, player, is_rotate=True, controlled=True):
         super().__init__(*group)
         self.tank = tank
         if col == 'blue':
@@ -604,18 +667,22 @@ class Tower(pygame.sprite.Sprite):
         self.center = (0, 0)
         self.mod = 0
         self.angle = 0
+        self.controlled = controlled
         self.st = time.time()
         self.mask = pygame.mask.from_surface(self.image)
 
-    def update(self, screen, time):
-        x1, y1 = pygame.mouse.get_pos()
+    def update(self, screen, time, coords):
+        if self.controlled:
+            x1, y1 = pygame.mouse.get_pos()
+        else:
+            x1, y1 = map(int, coords)
 
         if self.player:
             newang = math.degrees(math.atan2(y1 - self.rect.y, x1 - self.rect.x)) % 360
         else:
             newang = -90
-            #newang = math.degrees(math.atan2(tanks[0].y - self.rect.y, tanks[0].x - self.rect.x)) % 360
-        #self.angle += 0.5
+            # newang = math.degrees(math.atan2(tanks[0].y - self.rect.y, tanks[0].x - self.rect.x)) % 360
+        # self.angle += 0.5
         newang = 270 - newang
         if not self.is_rotate:
             newang = self.tank.angle
@@ -636,7 +703,7 @@ class Tower(pygame.sprite.Sprite):
         image = pipa[0]
         mask = pygame.mask.from_surface(image)
         rect = image.get_rect(center=pipa[1])
-        #self.center = (0, 0)
+        # self.center = (0, 0)
         oldrect = self.image.get_rect(center=self.center)
         for i in s:
             if i.tank != self.tank:
@@ -653,7 +720,7 @@ class Tower(pygame.sprite.Sprite):
         image = pipa[0]
         mask = pygame.mask.from_surface(image)
         rect = image.get_rect(center=pipa[1])
-        #self.center = (0, 0)
+        # self.center = (0, 0)
         oldrect = self.image.get_rect(center=self.center)
         for i in s:
             if i.id == 2:
@@ -672,20 +739,21 @@ class Tower(pygame.sprite.Sprite):
         else:
             self.rect = self.image.get_rect(center=pipa[1])
 
-
-
     def shoot(self, group):
         if time.time() - self.st < SHOOT_TIME:
             return
         self.st = time.time()
-        pos = (self.center[0] + 33 * math.cos(math.radians(270 - self.angle)), self.center[1] + 33 * math.sin(math.radians(270 - self.angle)))
-        #pygame.display.set_caption(f'{pos}')
+        pos = (self.center[0] + 33 * math.cos(math.radians(270 - self.angle)),
+               self.center[1] + 33 * math.sin(math.radians(270 - self.angle)))
+        # pygame.display.set_caption(f'{pos}')
         group.add(Shell(group, tank=self.tank, angle=self.angle, pos=pos))
+
 
 class Shell(pygame.sprite.Sprite):
     image = load_image("shell.png", colorkey=(255, 255, 255))
     images = [load_image(f"explode{i}.png", colorkey=(255, 255, 255)) for i in range(8)]
     w, h = image.get_size()
+
     def __init__(self, *group, tank, angle, pos):
         super().__init__(*group)
         self.rect = self.image.get_rect()
@@ -701,7 +769,7 @@ class Shell(pygame.sprite.Sprite):
         self.st = time.time()
 
     def update(self, screen, time):
-        #print(time)
+        # print(time)
         if self.mod == 1:
             self.explode()
             return
@@ -716,7 +784,7 @@ class Shell(pygame.sprite.Sprite):
                     i.hp -= 20
                     self.rect.x -= math.cos(math.radians(self.angle)) * (self.h / 2)
                     self.rect.y -= math.sin(math.radians(self.angle)) * (self.h / 2)
-                    #self.rect = self.image.get_rect(center=(self.rect.x, self.rect.y))
+                    # self.rect = self.image.get_rect(center=(self.rect.x, self.rect.y))
                     return
                 elif pygame.sprite.collide_mask(self, i.body):
                     i.hp -= 20
@@ -724,7 +792,7 @@ class Shell(pygame.sprite.Sprite):
                     self.image = self.images[0]
                     self.rect.x -= math.cos(math.radians(self.angle)) * (self.h / 2)
                     self.rect.y -= math.sin(math.radians(self.angle)) * (self.h / 2)
-                    #self.rect = self.image.get_rect(center=(self.rect.x, self.rect.y))
+                    # self.rect = self.image.get_rect(center=(self.rect.x, self.rect.y))
                     return
                 if i.hp <= 0:
                     pass
@@ -742,7 +810,7 @@ class Shell(pygame.sprite.Sprite):
 
         for i in tanks:
             if pygame.sprite.spritecollideany(self, i.shells) and i != self.tank:
-                #s = pygame.sprite.spritecollide(self, i.shells, False)
+                # s = pygame.sprite.spritecollide(self, i.shells, False)
                 if True:
                     self.mod = 1
                     self.image = self.images[0]
@@ -788,6 +856,7 @@ class Shell(pygame.sprite.Sprite):
             w, h = self.image.get_size()
             self.rect = self.image.get_rect(center=(self.rect.x + w / 2, self.rect.y + h / 2))
 
+
 tanks = []
 group = pygame.sprite.Group()
 tanks.append(Tank(group, (900, 600), 'blue', True))
@@ -796,6 +865,7 @@ tanks.append(Tank(group, (900, 100), 'green', False))
 tanks.append(Tank(group, (100, 600), 'yellow', False))
 maps = Map()
 while True:
+    print(glag)
     if False:
         pass
     elif glag == 1:
@@ -806,5 +876,3 @@ while True:
         start_double()
     elif glag == 3:
         moncol(SETTINGS)
-
-
