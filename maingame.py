@@ -155,7 +155,7 @@ def main_game():
 
 
 def start_double():
-    mode = input("CHOOSE MODE (1 - HOST; 2 - CONNECT): ")
+    mode = int(input("CHOOSE MODE (1 - HOST; 2 - CONNECT): "))
     global glag, SHOOT_TIME, tanks, group, maps, SETTINGS
     running = True
     tanks = []
@@ -174,8 +174,8 @@ def start_double():
         print("Connection: " + str(address))
     else:
         host, port = map(str, input('Enter IP address and port ("IP:port"): ').split(":"))
-        client_socket = socket.socket()
-        client_socket.connect((host, int(port)))
+        conn = socket.socket()
+        conn.connect((host, int(port)))
         tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=True, controlled=False))
         tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=True, controlled=True))
     moves = []
@@ -185,9 +185,10 @@ def start_double():
     rot1 = 0
     is_shoot = False
     is_shoot1 = False
+    lll = False
     while running:
-        a = pygame.event.get()
-        for event in a:
+        a = []
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
             # if event.type == pygame.MOUSEBUTTONDOWN:
@@ -199,96 +200,123 @@ def start_double():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_w and mode == 1:
                     move = 1
+                    a.append("K_w|d")
                 if event.key == pygame.K_a and mode == 1:
                     rot = 1
+                    a.append("K_a|d")
                 if event.key == pygame.K_s and mode == 1:
                     move = -1
+                    a.append("K_s|d")
                 if event.key == pygame.K_d and mode == 1:
                     rot = -1
+                    a.append("K_d|d")
                 if event.key == pygame.K_UP and mode == 2:
                     move1 = 1
+                    a.append("K_UP|d")
                 if event.key == pygame.K_LEFT and mode == 2:
                     rot1 = 1
+                    a.append("K_LEFT|d")
                 if event.key == pygame.K_DOWN and mode == 2:
                     move1 = -1
+                    a.append("K_DOWN|d")
                 if event.key == pygame.K_RIGHT and mode == 2:
                     rot1 = -1
+                    a.append("K_RIGHT|d")
                 if event.key == pygame.K_q and mode == 1:
                     is_shoot = True
+                    a.append("K_q|d")
                 if event.key == pygame.K_m and mode == 2:
                     is_shoot1 = True
+                    a.append("K_q|d")
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w and mode == 1:
                     move = 0
+                    a.append("K_w|d")
                 if event.key == pygame.K_a and mode == 1:
                     rot = 0
+                    a.append("K_a|d")
                 if event.key == pygame.K_s and mode == 1:
                     move = 0
+                    a.append("K_s|d")
                 if event.key == pygame.K_d and mode == 1:
                     rot = 0
-                if event.key == pygame.K_q and mode == 1:
-                    is_shoot = False
+                    a.append("K_d|d")
                 if event.key == pygame.K_UP and mode == 2:
                     move1 = 0
+                    a.append("K_UP|d")
                 if event.key == pygame.K_LEFT and mode == 2:
                     rot1 = 0
+                    a.append("K_LEFT|d")
                 if event.key == pygame.K_DOWN and mode == 2:
                     move1 = 0
+                    a.append("K_DOWN|d")
                 if event.key == pygame.K_RIGHT and mode == 2:
                     rot1 = 0
+                    a.append("K_RIGHT|d")
+                if event.key == pygame.K_q and mode == 1:
+                    is_shoot = False
+                    a.append("K_q|d")
                 if event.key == pygame.K_m and mode == 2:
                     is_shoot1 = False
-        a = str(a) + '|||' + str(pygame.mouse.get_pos())
-        conn.send(a.encode())
-        data = conn.recv(1024).decode()
-        data, coordinates = list(data.split('|||')[0]), tuple(data.split('|||')[1])
-        if mode == 1:
-            c1, c2 = pygame.mouse.get_pos(), coordinates
-        else:
-            c2, c1 = pygame.mouse.get_pos(), coordinates
-        for event in data:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w and mode == 2:
+                    a.append("K_q|d")
+        if lll:
+            a = ';;'.join(a)
+            b = '|'.join(list(map(str, list(pygame.mouse.get_pos()))))
+            conn.send(a.encode())
+            data = conn.recv(65536).decode().split(';;')
+            if not data:
+                break
+            conn.send(b.encode())
+            coordinates = conn.recv(65536).decode().split('|')
+            if not data:
+                break
+            if mode == 1:
+                c1, c2 = pygame.mouse.get_pos(), tuple(coordinates)
+            else:
+                c2, c1 = pygame.mouse.get_pos(), tuple(coordinates)
+            for event in data:
+                if event == 'K_w|u' and mode == 2:
                     move = 1
-                if event.key == pygame.K_a and mode == 2:
+                if event == 'K_a|u' and mode == 2:
                     rot = 1
-                if event.key == pygame.K_s and mode == 2:
+                if event == 'K_s|u' and mode == 2:
                     move = -1
-                if event.key == pygame.K_d and mode == 2:
+                if event == 'K_d|u' and mode == 2:
                     rot = -1
-                if event.key == pygame.K_q and mode == 2:
+                if event == 'K_q|u' and mode == 2:
                     is_shoot = True
-                if event.key == pygame.K_UP and mode == 1:
+                if event == 'K_UP|u' and mode == 1:
                     move1 = 1
-                if event.key == pygame.K_LEFT and mode == 1:
+                if event == 'K_LEFT|u' and mode == 1:
                     rot1 = 1
-                if event.key == pygame.K_DOWN and mode == 1:
+                if event == 'K_DOWN|u' and mode == 1:
                     move1 = -1
-                if event.key == pygame.K_RIGHT and mode == 1:
+                if event == 'K_RIGHT|u' and mode == 1:
                     rot1 = -1
-                if event.key == pygame.K_m and mode == 1:
+                if event == 'K_m|u' and mode == 1:
                     is_shoot1 = True
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_w and mode == 2:
+                if event == 'K_w|d' and mode == 2:
                     move = 0
-                if event.key == pygame.K_a and mode == 2:
+                if event == 'K_a|d' and mode == 2:
                     rot = 0
-                if event.key == pygame.K_s and mode == 2:
+                if event == 'K_s|d' and mode == 2:
                     move = 0
-                if event.key == pygame.K_d and mode == 2:
+                if event == 'K_d|d' and mode == 2:
                     rot = 0
-                if event.key == pygame.K_q and mode == 2:
+                if event == 'K_q|d' and mode == 2:
                     is_shoot = False
-                if event.key == pygame.K_UP and mode == 1:
+                if event == 'K_UP|d' and mode == 1:
                     move1 = 0
-                if event.key == pygame.K_LEFT and mode == 1:
+                if event == 'K_LEFT|d' and mode == 1:
                     rot1 = 0
-                if event.key == pygame.K_DOWN and mode == 1:
+                if event == 'K_DOWN|d' and mode == 1:
                     move1 = 0
-                if event.key == pygame.K_RIGHT and mode == 1:
+                if event == 'K_RIGHT|d' and mode == 1:
                     rot1 = 0
-                if event.key == pygame.K_m and mode == 1:
+                if event == 'K_m|d' and mode == 1:
                     is_shoot1 = False
+        else:
+            c1, c2 = (0, 0), (0, 0)
         yy = clock.tick()
         moves = [(move, rot, is_shoot, c1), (move1, rot1, is_shoot1, c2)]
         screen.fill((0, 0, 0))
@@ -319,6 +347,7 @@ def start_double():
             return
         pygame.display.set_caption(f'{SETTINGS}')
         pygame.display.flip()
+        lll = True
 
 
 def start_screen():
