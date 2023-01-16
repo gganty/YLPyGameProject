@@ -1,0 +1,133 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "Все файлы (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "#outdoor": {
+            "scaleInDock": 1
+        },
+        "C:/Program Files/Tiled/examples/desert.tmx": {
+            "scale": 0.30578125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 640.9810935104753,
+                "y": 642.6162493612673
+            }
+        },
+        "C:/Program Files/Tiled/examples/desert.tsx": {
+            "scaleInDock": 1
+        },
+        "C:/Program Files/Tiled/examples/hexagonal-mini.tmx": {
+            "scale": 1.3637630662020905,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 143.71997956055188,
+                "y": 92.02478283086356
+            }
+        },
+        "C:/Program Files/Tiled/examples/hexagonal-mini.tmx#hex mini": {
+            "scaleInDock": 1
+        },
+        "C:/Program Files/Tiled/examples/isometric_grass_and_water.tmx": {
+            "scale": 0.24462499999999998,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 801.226366888094,
+                "y": 402.657128257537
+            }
+        },
+        "C:/Program Files/Tiled/examples/isometric_grass_and_water.tmx#isometric_grass_and_water": {
+            "scaleInDock": 1
+        },
+        "C:/Program Files/Tiled/examples/orthogonal-outside.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 123.33333333333333,
+                "y": 240.33333333333331
+            }
+        },
+        "C:/Program Files/Tiled/examples/orthogonal-outside.tmx#outdoor": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "C:/Program Files/Tiled/examples/sewers.tmx": {
+            "scale": 0.32616666666666666,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 600.9197751660705,
+                "y": 602.4527337761879
+            }
+        },
+        "C:/Program Files/Tiled/examples/sewers.tmx#sewer_tileset": {
+            "scaleInDock": 1
+        },
+        "Wall.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "buch-outdoor.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 4
+        },
+        "simple_map.tmx": {
+            "scale": 0.8570858283433133,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 500.5333022822543,
+                "y": 501.7000465766186
+            }
+        },
+        "simple_map.tmx#Wall": {
+            "scaleInDock": 1
+        },
+        "tile.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tmw_desert_spacing.tsx": {
+            "scaleInDock": 11,
+            "scaleInEditor": 1
+        }
+    },
+    "last.externalTilesetPath": "C:/Users/serge/PycharmProjects/TrainMe/tmx",
+    "last.imagePath": "C:/Program Files/Tiled/examples",
+    "map.height": 200,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 32,
+    "map.tileWidth": 32,
+    "map.width": 200,
+    "openFiles": [
+    ],
+    "project": "Maps.tiled-project",
+    "recentFiles": [
+        "buch-outdoor.tsx",
+        "simple_map.tmx",
+        "Wall.tsx",
+        "tile.tsx",
+        "tmw_desert_spacing.tsx",
+        "C:/Program Files/Tiled/examples/orthogonal-outside.tmx",
+        "C:/Program Files/Tiled/examples/sewers.tmx",
+        "C:/Program Files/Tiled/examples/desert.tmx",
+        "C:/Program Files/Tiled/examples/hexagonal-mini.tmx",
+        "C:/Program Files/Tiled/examples/isometric_grass_and_water.tmx"
+    ],
+    "tileset.embedInMap": false,
+    "tileset.lastUsedFilter": "Файлы набора тайлов Tiled (*.tsx *.xml)",
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.margin": 1,
+    "tileset.spacing": 1,
+    "tileset.tileSize": {
+        "height": 15,
+        "width": 15
+    }
+}
