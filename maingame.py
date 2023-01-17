@@ -256,7 +256,6 @@ def start_double():
                     is_shoot1 = False
                     a.append("K_m|u")
         a = ';;'.join(a + list(map(str, list(pygame.mouse.get_pos()))))
-        print(a)
         conn.send(a.encode())
         data = conn.recv(1024).decode().split(';;')
         coordinates = tuple(data[-2:])
