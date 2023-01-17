@@ -170,11 +170,11 @@ def start_double():
     clock = pygame.time.Clock()
     group = pygame.sprite.Group()
     if mode == 1:
-        tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=False, controlled=True))
-        tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=False, controlled=False))
+        tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=True, controlled=True))
+        tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=True, controlled=False))
     else:
-        tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=False, controlled=False))
-        tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=False, controlled=True))
+        tanks.append(Tank(group, (900, 600), 'blue', True, is_rotate=True, controlled=False))
+        tanks.append(Tank(group, (100, 100), 'red', True, is_rotate=True, controlled=True))
     moves = []
     move = 0
     rot = 0
