@@ -10,13 +10,13 @@ import socket
 # Изображение не получится загрузить
 # без предварительной инициализации pygame
 pygame.init()
-mode = int(input("CHOOSE MODE (1 - Host; 2 - Connect): "))
+mode = int(input("CHOOSE MODE (1 - Host; 2 - Connect; 3 - Single-player): "))
 if mode == 1:
     server_socket = socket.socket()
     server_socket.bind(('localhost', 5000))
     server_socket.listen(1)
     conn, address = server_socket.accept()
-else:
+elif mode == 2:
     host, port = 'localhost', 5000
     conn = socket.socket()
     conn.connect((host, port))
