@@ -10,16 +10,6 @@ import socket
 # Изображение не получится загрузить
 # без предварительной инициализации pygame
 pygame.init()
-mode = int(input("CHOOSE MODE (1 - Host; 2 - Connect; 3 - Single-player): "))
-if mode == 1:
-    server_socket = socket.socket()
-    server_socket.bind(('localhost', 5000))
-    server_socket.listen(1)
-    conn, address = server_socket.accept()
-elif mode == 2:
-    host, port = 'localhost', 5000
-    conn = socket.socket()
-    conn.connect((host, port))
 size = width, height = 1000, 1000
 screen = pygame.display.set_mode(size)
 SHOOT_TIME = 1.0
@@ -85,10 +75,10 @@ def main_game():
     global glag, SHOOT_TIME, tanks, group, maps
     tanks = []
     group = pygame.sprite.Group()
-    tanks.append(Tank(group, (900, 600), 'blue', True))
-    tanks.append(Tank(group, (100, 100), 'red', False))
-    tanks.append(Tank(group, (900, 100), 'green', False))
-    tanks.append(Tank(group, (100, 600), 'yellow', False))
+    tanks.append(Tank(group, (900, 600), 'blue', True, controlled=True))
+    tanks.append(Tank(group, (100, 100), 'red', False, controlled=False))
+    tanks.append(Tank(group, (900, 100), 'green', False, controlled=False))
+    tanks.append(Tank(group, (100, 600), 'yellow', False, controlled=False))
     maps = Map()
     clock = pygame.time.Clock()
     running = True
@@ -338,29 +328,68 @@ def start_double():
 
 
 def start_screen():
-    global glag
-    start = load_image("start.png")
+    uhm_screen(1)
+
+
+def bruh_screen():
+    uhm_screen(2)
+
+
+def uhm_screen(modee):
+    global glag, mode, conn
+    if modee == 1:
+        start = load_image("start.png")
+    else:
+        start = load_image("multipulti.png")
     running = True
     tank = load_image('tank0.png', colorkey=(255, 255, 255))
-    s = [(310, 360), (310, 465), (310, 570)]
+    if modee == 1:
+        s = [(310, 360), (310, 465), (310, 570)]
+    else:
+        s = [(100, 425), (500, 425), (350, 615)]
     ind = 0
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    ind -= 1
-                if event.key == pygame.K_s:
-                    ind += 1
-                if event.key == pygame.K_RETURN:
-                    if ind == 0:
-                        print(1)
-                        glag = 0
-                        return
-                    if ind == 1:
-                        glag = 2
-                        return
+                if modee == 1:
+                    if event.key == pygame.K_w:
+                        ind -= 1
+                    if event.key == pygame.K_s:
+                        ind += 1
+                    if event.key == pygame.K_RETURN:
+                        if ind == 0:
+                            print(1)
+                            glag = 0
+                            return
+                        if ind == 1:
+                            glag = 2
+                            return
+                else:
+                    if event.key == pygame.K_w:
+                        ind -= 1
+                    if event.key == pygame.K_s:
+                        ind += 1
+                    if event.key == pygame.K_RETURN:
+                        if ind == 0:  # host
+                            server_socket = socket.socket()
+                            server_socket.bind(('localhost', 5000))
+                            server_socket.listen(1)
+                            conn, address = server_socket.accept()
+                            mode = 1
+                            glag = 4
+                            return
+                        if ind == 1:  # connect
+                            host, port = 'localhost', 5000
+                            conn = socket.socket()
+                            conn.connect((host, port))
+                            mode = 2
+                            glag = 4
+                            return
+                        if ind == 2:
+                            glag = 1
+                            return
         ind %= 3
         screen.blit(start, (0, 0))
         screen.blit(tank, s[ind])
@@ -451,7 +480,7 @@ class Tank:
         self.color = color
         self.y = pos[1]
 
-    def update(self, screen, time, move, coords=None):
+    def update(self, screen, time, move, coords=(0, 0)):
         if self.hp <= 0:
             return
         self.tower.rect.x = self.x - math.cos(math.radians(270 - self.angle)) * 12
@@ -696,8 +725,7 @@ class Tower(pygame.sprite.Sprite):
         if self.player:
             newang = math.degrees(math.atan2(y1 - self.rect.y, x1 - self.rect.x)) % 360
         else:
-            newang = -90
-            # newang = math.degrees(math.atan2(tanks[0].y - self.rect.y, tanks[0].x - self.rect.x)) % 360
+            newang = math.degrees(math.atan2(tanks[0].y - self.rect.y, tanks[0].x - self.rect.x)) % 360
         # self.angle += 0.5
         newang = 270 - newang
         if not self.is_rotate:
@@ -883,11 +911,13 @@ maps = Map()
 while True:
     if False:
         pass
+    elif glag == 2:
+        bruh_screen()
     elif glag == 1:
         start_screen()
     elif glag == 0:
         main_game()
-    elif glag == 2:
+    elif glag == 4:
         start_double()
     elif glag == 3:
         moncol(SETTINGS)
