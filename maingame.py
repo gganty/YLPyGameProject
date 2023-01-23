@@ -383,7 +383,11 @@ def uhm_screen(modee):
                         if ind == 1:  # connect
                             host, port = 'localhost', 5000
                             conn = socket.socket()
-                            conn.connect((host, port))
+                            try:
+                                conn.connect((host, port))
+                            except ConnectionRefusedError:
+                                glag = 2
+                                return
                             mode = 2
                             glag = 4
                             return
