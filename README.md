@@ -1,5 +1,5 @@
 # YLPyGameProject
-АРТЁМ ВСЁ СЛОМАЛ
+АРТЁМ ВСЁ СЛОМАЛ (ну почти всё)
 using System
 
 namespace ConsoleApp1
@@ -10,7 +10,7 @@ namespace ConsoleApp1
     {
       for (int i = 0; i < 10;i++)
       {
-        Console.WriteLine("АРТЁМ ВСЕ СЛОМАЛ")
+        Console.WriteLine("АРТЁМ ВСЕ СЛОМАЛ (ну почти всё)")
         Console.WriteLine("Обломись мой C#")
       }
     }
