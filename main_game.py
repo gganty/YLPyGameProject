@@ -613,8 +613,8 @@ class Tower(pygame.sprite.Sprite):
         if self.player:
             newang = math.degrees(math.atan2(y1 - self.rect.y, x1 - self.rect.x)) % 360
         else:
-            newang = -90
-            #newang = math.degrees(math.atan2(tanks[0].y - self.rect.y, tanks[0].x - self.rect.x)) % 360
+            #newang = -90
+            newang = math.degrees(math.atan2(tanks[0].y - self.rect.y, tanks[0].x - self.rect.x)) % 360
         #self.angle += 0.5
         newang = 270 - newang
         if not self.is_rotate:
